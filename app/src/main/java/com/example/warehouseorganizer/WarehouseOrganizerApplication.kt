@@ -8,6 +8,6 @@ class WarehouseOrganizerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        appContainer = WarehouseOrganizerContainer()
+        appContainer = WarehouseOrganizerContainer(applicationContext)
     }
 }
