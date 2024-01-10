@@ -1,6 +1,7 @@
 package com.example.warehouseorganizer.ui.add
 
-import android.net.Uri
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.ImageBitmap
 import com.example.warehouseorganizer.model.Item
 
 data class AddUIState(
@@ -8,16 +9,20 @@ data class AddUIState(
 )
 
 data class AddEvent(
-    val imageUri: Uri = Uri.EMPTY,
+    val id: String = "",
+    val imageUrl: String = "",
     val name: String = "",
     val rack: String = "",
-    val quantity: String = ""
+    val quantity: Int = 0,
+    val imageBitmap:Bitmap? = null
 )
 
 fun AddEvent.toItem() = Item(
+    id = id,
+    imageUrl = imageUrl,
     name = name,
     rack = rack,
-    quantity = quantity.toIntOrNull() ?: 0
+    quantity = quantity
 )
 
 data class DetailUIState(
@@ -26,9 +31,11 @@ data class DetailUIState(
 
 fun Item.toDetailItem(): AddEvent =
     AddEvent(
+        id = id,
+        imageUrl = imageUrl,
         name = name,
         rack = rack,
-        quantity = quantity.toString()
+        quantity = quantity
     )
 
 fun Item.toUIStateItem(): AddUIState = AddUIState(
