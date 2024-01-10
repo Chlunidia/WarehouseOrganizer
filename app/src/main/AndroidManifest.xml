@@ -17,7 +17,7 @@
         android:theme="@style/Theme.WarehouseOrganizer"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".WarehouseOrganizerApp"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.WarehouseOrganizer">

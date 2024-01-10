@@ -1,6 +1,7 @@
 package com.example.warehouseorganizer.ui.login
 
 import android.graphics.Color.parseColor
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,12 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -33,7 +34,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.warehouseorganizer.R
-import com.example.warehouseorganizer.data.LoginRepository
 import com.example.warehouseorganizer.navigation.NavigationDestination
 import kotlinx.coroutines.launch
 
@@ -51,6 +51,7 @@ fun LoginScreen(
     val emailState = loginViewModel.emailState
     val passwordState = loginViewModel.passwordState
     val loginState by loginViewModel.loginState.collectAsState()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -86,10 +87,9 @@ fun LoginScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)
-                        .align(Alignment.CenterHorizontally), // Center horizontally
+                        .align(Alignment.CenterHorizontally),
                     color = Color.Black
                 )
-
                 TextField(
                     value = emailState.value,
                     onValueChange = { loginViewModel.onEmailChange(it) },
@@ -107,7 +107,6 @@ fun LoginScreen(
                         .padding(horizontal = 16.dp, vertical = 5.dp)
                         .background(Color.White, CircleShape)
                 )
-
                 OutlinedTextField(
                     value = passwordState.value,
                     onValueChange = { loginViewModel.onPasswordChange(it) },
@@ -126,29 +125,17 @@ fun LoginScreen(
                         .padding(horizontal = 16.dp, vertical = 5.dp)
                         .background(Color.White, CircleShape)
                 )
-
                 Button(
                     onClick = {
                         loginViewModel.viewModelScope.launch {
-                            // Panggil metode loginUser
                             loginViewModel.loginUser()
-
-                            // Ambil nilai loginState setelah loginUser selesai
                             val loginResult = loginViewModel.loginState.value
-
-                            // Tambahkan logika untuk menangani hasil login
                             when (loginResult) {
                                 is LoginState.Success -> {
-                                    // Jika login berhasil, panggil callback onLoginSuccess
                                     onLoginSuccess()
                                 }
                                 is LoginState.Error -> {
-                                    // Tampilkan pesan error jika login gagal
-                                    // Anda juga bisa menambahkan logika lain sesuai kebutuhan
-                                    // Contoh: menampilkan snackbar, dialog, dsb.
                                 }
-                                // Tambahkan penanganan state lainnya jika diperlukan
-                                // Contoh: Loading state
                                 else -> {}
                             }
                         }
@@ -169,7 +156,6 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
-
             }
         }
     }

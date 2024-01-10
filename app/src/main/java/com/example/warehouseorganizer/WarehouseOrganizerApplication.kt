@@ -1,15 +1,13 @@
 package com.example.warehouseorganizer
 
 import android.app.Application
-import com.example.warehouseorganizer.data.AppContainer
-import com.example.warehouseorganizer.data.LoginContainer
+import com.example.warehouseorganizer.data.WarehouseOrganizerContainer
 
 class WarehouseOrganizerApplication : Application() {
-    lateinit var appContainer: AppContainer
-        private set
+    lateinit var appContainer: WarehouseOrganizerContainer
 
     override fun onCreate() {
         super.onCreate()
-        appContainer = LoginContainer()
+        appContainer = WarehouseOrganizerContainer()
     }
 }
