@@ -29,7 +29,7 @@ import com.example.warehouseorganizer.ui.add.WarehouseOrganizerTopAppBar
 
 object DestinasiHome : NavigationDestination {
     override val route = "home"
-    override val titleRes = "Home"
+    override val titleRes = "Item"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +37,7 @@ object DestinasiHome : NavigationDestination {
 fun HomeScreen(
     navigateToItemEntry: () -> Unit,
     modifier: Modifier = Modifier,
-    onDetailClick: (String) -> Unit = {},
+    onDetailClick: (Item) -> Unit = {},
     viewModel: HomeViewModel = viewModel(factory = ViewModelProviderFactory.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -79,7 +79,7 @@ fun HomeScreen(
 fun BodyHome(
     items: List<Item>,
     modifier: Modifier = Modifier,
-    onItemClick: (String) -> Unit = {}
+    onItemClick: (Item) -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -96,7 +96,7 @@ fun BodyHome(
                 items = items,
                 modifier = Modifier
                     .padding(horizontal = 8.dp),
-                onItemClick = { onItemClick(it.id) }
+                onItemClick = onItemClick
             )
         }
     }
@@ -132,9 +132,9 @@ fun ItemCard(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Row(
+            modifier = Modifier
+                .padding(12.dp)
         ) {
             val painter = rememberImagePainter(
                 data = item.imageUrl,
@@ -147,13 +147,14 @@ fun ItemCard(
                 painter = painter,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(120.dp)
                     .height(120.dp)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop
             )
-            Row(
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .padding(start = 12.dp)
             ) {
                 Text(
                     text = item.name,
@@ -164,11 +165,11 @@ fun ItemCard(
                     text = item.rack,
                     style = MaterialTheme.typography.titleMedium
                 )
+                Text(
+                    text = item.quantity.toString(),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
-            Text(
-                text = item.quantity.toString(),
-                style = MaterialTheme.typography.titleMedium
-            )
         }
     }
 }
