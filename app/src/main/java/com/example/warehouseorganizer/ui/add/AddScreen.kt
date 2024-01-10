@@ -1,10 +1,24 @@
 package com.example.warehouseorganizer.ui.add
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,24 +35,37 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.warehouseorganizer.navigation.NavigationDestination
 import com.example.warehouseorganizer.ui.ViewModelProviderFactory
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 object DestinasiEntry : NavigationDestination {
     override val route = "item_entry"
     override val titleRes = "Entry"
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
     navigateBack: () -> Unit,
+    context: Context,
     modifier: Modifier = Modifier,
     addViewModel: AddViewModel = viewModel(factory = ViewModelProviderFactory.Factory)
 ) {
@@ -56,14 +83,16 @@ fun AddScreen(
             )
         }
     ) { innerPadding ->
-
         EntryBody(
             addUIState = addViewModel.addUIState,
             onItemValueChange = addViewModel::updateAddUIState,
-            onSaveClick = {
+            onSaveClick = { bitmap, name, rack, quantity ->
                 coroutineScope.launch {
-                    addViewModel.addItem()
-                    navigateBack()
+                    if (bitmap != null) {
+                        addViewModel.saveItem(bitmap, name, rack, quantity)
+                        navigateBack()
+                        Toast.makeText(context, "Data Added", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             modifier = Modifier
@@ -71,6 +100,7 @@ fun AddScreen(
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
         )
+
     }
 }
 
@@ -78,7 +108,7 @@ fun AddScreen(
 fun EntryBody(
     addUIState: AddUIState,
     onItemValueChange: (AddEvent) -> Unit,
-    onSaveClick: () -> Unit,
+    onSaveClick: (Bitmap?, String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -88,10 +118,18 @@ fun EntryBody(
         FormInput(
             addEvent = addUIState.addEvent,
             onValueChange = onItemValueChange,
+            onSaveClick = onSaveClick,
             modifier = Modifier.fillMaxWidth()
         )
         Button(
-            onClick = onSaveClick,
+            onClick = {
+                onSaveClick(
+                    addUIState.addEvent.imageBitmap,
+                    addUIState.addEvent.name,
+                    addUIState.addEvent.rack,
+                    addUIState.addEvent.quantity
+                )
+            },
             shape = MaterialTheme.shapes.small,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -104,20 +142,60 @@ fun EntryBody(
 @Composable
 fun FormInput(
     addEvent: AddEvent,
+    onSaveClick: (Bitmap?, String, String, Int) -> Unit,
     modifier: Modifier = Modifier,
-    onValueChange: (AddEvent) -> Unit = {},
-    enabled: Boolean = true
+    onValueChange: (AddEvent) -> Unit = {}
 ) {
+    val context = LocalContext.current
+    var imageUri by remember { mutableStateOf<String?>(null) }
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    val launcherGallery = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            imageUri = uri.toString()
+            imageUri?.let {
+                bitmap = context.getBitmapFromUri(Uri.parse(it))
+                onValueChange(addEvent.copy(imageBitmap = bitmap)) // Update AddEvent with Bitmap
+            }
+        }
+    )
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp)
+            .clip(
+                shape = RoundedCornerShape(15.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = Color.Black,
+                shape = RoundedCornerShape(15.dp)
+            )
+            .clickable {
+                launcherGallery.launch("image/*")
+            }
+        ) {
+            if (bitmap != null) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    bitmap = bitmap!!.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Text(text = "Click To Add Image", modifier = Modifier.align(Alignment.Center))
+            }
+        }
         OutlinedTextField(
             value = addEvent.name,
             onValueChange = { onValueChange(addEvent.copy(name = it)) },
             label = { Text("Name") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
             singleLine = true
         )
         OutlinedTextField(
@@ -125,18 +203,17 @@ fun FormInput(
             onValueChange = { onValueChange(addEvent.copy(rack = it)) },
             label = { Text("Rack") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
             singleLine = true
         )
         OutlinedTextField(
-            value = addEvent.quantity,
-            onValueChange = { onValueChange(addEvent.copy(quantity = it)) },
+            value = addEvent.quantity.toString(),
+            onValueChange = { onValueChange(addEvent.copy(quantity = it.toIntOrNull() ?: 0)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = { Text("Quantity") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
             singleLine = true,
-            isError = addEvent.quantity.isNotEmpty() && !addEvent.quantity.matches(Regex("\\d+"))
+            isError = addEvent.quantity.toString().isNotEmpty() && !addEvent.quantity.toString()
+                .matches(Regex("\\d+"))
         )
     }
 }
@@ -164,4 +241,14 @@ fun WarehouseOrganizerTopAppBar(
             }
         }
     )
+}
+
+fun Context.getBitmapFromUri(uri: Uri): Bitmap? {
+    return try {
+        val inputStream = contentResolver.openInputStream(uri)
+        BitmapFactory.decodeStream(inputStream)
+    } catch (e: IOException) {
+        e.printStackTrace()
+        null
+    }
 }
