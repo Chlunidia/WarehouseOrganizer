@@ -166,7 +166,7 @@ fun FormInput(
     ) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)
+            .height(380.dp)
             .clip(
                 shape = RoundedCornerShape(15.dp)
             )
