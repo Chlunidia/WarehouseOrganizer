@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -80,7 +81,7 @@ fun DetailScreen(
             FloatingActionButton(
                 onClick = { navigateToEditItem(uiState.addEvent.id) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(18.dp)
+                modifier = Modifier.padding(bottom = 60.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
@@ -122,10 +123,15 @@ private fun ItemDetailsBody(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedButton(
+        Button(
             onClick = { deleteConfirmationRequired = true },
             shape = MaterialTheme.shapes.small,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .clip(
+                    shape = RoundedCornerShape(20.dp)
+                )
         ) {
             Text("Delete")
         }
