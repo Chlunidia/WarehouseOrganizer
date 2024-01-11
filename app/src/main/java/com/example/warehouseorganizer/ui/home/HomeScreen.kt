@@ -50,7 +50,7 @@ fun HomeScreen(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             WarehouseOrganizerTopAppBar(
-                title = "Home",
+                title = "Warehouse Organizer",
                 canNavigateBack = false,
                 scrollBehavior = scrollBehavior
             )
@@ -81,7 +81,7 @@ fun HomeScreen(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
+            modifier = modifier.padding(top = 50.dp)
         ) {
             OutlinedTextField(
                 value = searchQuery,
@@ -93,7 +93,6 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             )
-
             if (filteredItems.isEmpty()) {
                 Text(
                     text = "No items available",
@@ -104,38 +103,10 @@ fun HomeScreen(
                 ListItem(
                     items = filteredItems,
                     modifier = Modifier
-                        .padding(innerPadding)
                         .fillMaxSize(),
                     onItemClick = onDetailClick
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun BodyHome(
-    items: List<Item>,
-    modifier: Modifier = Modifier,
-    onItemClick: (Item) -> Unit = {}
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        if (items.isEmpty()) {
-            Text(
-                text = "No items available",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge
-            )
-        } else {
-            ListItem(
-                items = items,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                onItemClick = onItemClick
-            )
         }
     }
 }
@@ -147,7 +118,7 @@ fun ListItem(
     onItemClick: (Item) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier = modifier.padding(16.dp)
     ) {
         items(items, key = { it.id }) { item ->
             ItemCard(
