@@ -3,9 +3,12 @@ package com.example.warehouseorganizer.ui.signup
 import android.content.Context
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.example.warehouseorganizer.R
 import com.example.warehouseorganizer.navigation.NavigationDestination
@@ -47,40 +51,8 @@ fun SignUpScreen(
     navController: NavController,
     signUpViewModel: SignUpViewModel,
     onSignUpSuccess: () -> Unit
-)  {
-    val context = LocalContext.current
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .paint(
-                painter = painterResource(id = R.drawable.background_page),
-                contentScale = ContentScale.FillHeight
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .width(400.dp)
-                .height(450.dp)
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
-                )
-                .padding(16.dp)
-        ) {
-            SignUpForm(signUpViewModel, onSignUpSuccess, context)
-        }
-    }
-}
-
-@Composable
-fun SignUpForm(
-    signUpViewModel: SignUpViewModel,
-    onSignUpSuccess: () -> Unit,
-    context: Context
 ) {
+    val context = LocalContext.current
     val usernameState by signUpViewModel.usernameState.collectAsState()
     val emailState by signUpViewModel.emailState.collectAsState()
     val passwordState by signUpViewModel.passwordState.collectAsState()
@@ -89,81 +61,107 @@ fun SignUpForm(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(400.dp),
+            .fillMaxHeight()
+            .paint(
+                painter = painterResource(id = R.drawable.background_page),
+                contentScale = ContentScale.FillHeight
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Sign Up",
-            fontSize = 40.sp,
-            fontWeight = FontWeight.Bold,
+        ConstraintLayout(
             modifier = Modifier
-                .padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)
-                .align(Alignment.CenterHorizontally),
-            color = Color.Black
-        )
-
-        TextField(
-            value = usernameState,
-            onValueChange = { signUpViewModel.onUsernameChange(it) },
-            label = { Text(text = "Type your Username") },
-            shape = RoundedCornerShape(20.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color(parseColor("#e0f5f4")),
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                textColor = Color(parseColor("#5E5E5E")),
-                unfocusedLabelColor = Color(parseColor("#5E5E5E"))),
-            modifier = textFieldModifier
-        )
-
-        TextField(
-            value = emailState,
-            onValueChange = { signUpViewModel.onEmailChange(it) },
-            label = { Text(text = "Type your Email") },
-            shape = RoundedCornerShape(20.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color(parseColor("#e0f5f4")),
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                textColor = Color(parseColor("#5E5E5E")),
-                unfocusedLabelColor = Color(parseColor("#5E5E5E"))),
-            modifier = textFieldModifier
-        )
-
-        OutlinedTextField(
-            value = passwordState,
-            onValueChange = { signUpViewModel.onPasswordChange(it) },
-            label = { Text(text = "Type your Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            shape = RoundedCornerShape(20.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color(parseColor("#e0f5f4")),
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                textColor = Color(parseColor("#5E5E5E")),
-                unfocusedLabelColor = Color(parseColor("#5E5E5E"))),
-            modifier = textFieldModifier
-        )
-
-        Button(
-            onClick = {
-                signUpViewModel.signUpUser(onSignUpSuccess)
-            },
-            modifier = Modifier
+                .fillMaxHeight()
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp)
-                .height(55.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(parseColor("#faac64"))
-            ),
-            shape = RoundedCornerShape(20.dp)
         ) {
-            Text(
-                text = "Sign Up",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
+            val (topText, column) = createRefs()
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
+                    .constrainAs(column) {
+                        bottom.linkTo(parent.bottom)
+                    }
+                    .background(
+                        color = Color(parseColor("#ffffff")),
+                        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
+                    )
+            ) {
+                Text(
+                    text = "Sign Up",
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = Color.Black
+                )
+                OutlinedTextField(
+                    value = usernameState,
+                    onValueChange = { signUpViewModel.onUsernameChange(it) },
+                    label = { Text(text = "Type your Username") },
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = textFieldModifier
+                )
+
+                OutlinedTextField(
+                    value = emailState,
+                    onValueChange = { signUpViewModel.onEmailChange(it) },
+                    label = { Text(text = "Type your Email") },
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = textFieldModifier
+                )
+
+                OutlinedTextField(
+                    value = passwordState,
+                    onValueChange = { signUpViewModel.onPasswordChange(it) },
+                    label = { Text(text = "Type your Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = textFieldModifier
+                )
+
+                Button(
+                    onClick = {
+                        signUpViewModel.signUpUser(onSignUpSuccess)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
+                        .height(55.dp),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text(
+                        text = "Sign Up",
+                        color = Color.White,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Have an account?",
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp)
+                    )
+                    Text(
+                        text = "Login",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate("loginScreen")
+                            }
+                    )
+                }
+            }
         }
     }
 }

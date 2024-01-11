@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
@@ -73,6 +74,7 @@ fun HomeScreen(
             modifier = modifier.padding(top = 50.dp)
         ) {
             OutlinedTextField(
+                shape = RoundedCornerShape(20.dp),
                 value = searchQuery,
                 onValueChange = {
                     searchQuery = it
@@ -199,7 +201,6 @@ fun ItemCard(
     }
 }
 
-// Definisikan enum untuk tab dengan indeks
 enum class NavItem(val index: Int) {
     Home(0),
     AddItem(1),
@@ -222,19 +223,16 @@ fun BottomNavigationBar(
         // Tambahkan item untuk setiap tab di bottom navigation bar
         BottomNavigationItem(
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") },
             selected = selectedTab == NavItem.Home,
             onClick = { navigateToHome() }
         )
         BottomNavigationItem(
             icon = { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") },
-            label = { Text("Add Item") },
             selected = selectedTab == NavItem.AddItem,
             onClick = { navigateToItemEntry() }
         )
         BottomNavigationItem(
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = "Profile") },
-            label = { Text("Profile") },
             selected = selectedTab == NavItem.Profile,
             onClick = { navigateToProfile() }
         )

@@ -24,6 +24,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -130,7 +132,13 @@ fun EntryBody(
                 )
             },
             shape = MaterialTheme.shapes.small,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .padding(horizontal = 10.dp)
+                .clip(
+                    shape = RoundedCornerShape(20.dp)
+                )
         ) {
             Text("Submit")
         }
@@ -145,75 +153,88 @@ fun FormInput(
     modifier: Modifier = Modifier,
     onValueChange: (AddEvent) -> Unit = {}
 ) {
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<String?>(null) }
-    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-
-    val launcherGallery = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            imageUri = uri.toString()
-            imageUri?.let {
-                bitmap = context.getBitmapFromUri(Uri.parse(it))
-                onValueChange(addEvent.copy(imageBitmap = bitmap))
-            }
-        }
-    )
-
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    Card(
+        modifier = modifier.padding(10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
     ) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(380.dp)
-            .clip(
-                shape = RoundedCornerShape(15.dp)
-            )
-            .border(
-                width = 1.dp,
-                color = Color.Black,
-                shape = RoundedCornerShape(15.dp)
-            )
-            .clickable {
-                launcherGallery.launch("image/*")
+        val context = LocalContext.current
+        var imageUri by remember { mutableStateOf<String?>(null) }
+        var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+        val launcherGallery = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+            onResult = { uri ->
+                imageUri = uri.toString()
+                imageUri?.let {
+                    bitmap = context.getBitmapFromUri(Uri.parse(it))
+                    onValueChange(addEvent.copy(imageBitmap = bitmap))
+                }
             }
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (bitmap != null) {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    bitmap = bitmap!!.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(350.dp)
+                .clip(
+                    shape = RoundedCornerShape(20.dp)
                 )
-            } else {
-                Text(text = "Click To Add Image", modifier = Modifier.align(Alignment.Center))
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .clickable {
+                    launcherGallery.launch("image/*")
+                }
+            ) {
+                if (bitmap != null) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        bitmap = bitmap!!.asImageBitmap(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Text(text = "Click To Add Image", modifier = Modifier.align(Alignment.Center))
+                }
             }
+            OutlinedTextField(
+                shape = RoundedCornerShape(20.dp),
+                value = addEvent.name,
+                onValueChange = { onValueChange(addEvent.copy(name = it)) },
+                label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            OutlinedTextField(
+                shape = RoundedCornerShape(20.dp),
+                value = addEvent.rack,
+                onValueChange = { onValueChange(addEvent.copy(rack = it)) },
+                label = { Text("Rack") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            OutlinedTextField(
+                shape = RoundedCornerShape(20.dp),
+                value = addEvent.quantity.toString(),
+                onValueChange = { onValueChange(addEvent.copy(quantity = it.toIntOrNull() ?: 0)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("Quantity") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                isError = addEvent.quantity.toString().isNotEmpty() && !addEvent.quantity.toString()
+                    .matches(Regex("\\d+"))
+            )
         }
-        OutlinedTextField(
-            value = addEvent.name,
-            onValueChange = { onValueChange(addEvent.copy(name = it)) },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        OutlinedTextField(
-            value = addEvent.rack,
-            onValueChange = { onValueChange(addEvent.copy(rack = it)) },
-            label = { Text("Rack") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        OutlinedTextField(
-            value = addEvent.quantity.toString(),
-            onValueChange = { onValueChange(addEvent.copy(quantity = it.toIntOrNull() ?: 0)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text("Quantity") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            isError = addEvent.quantity.toString().isNotEmpty() && !addEvent.quantity.toString()
-                .matches(Regex("\\d+"))
-        )
     }
 }
 

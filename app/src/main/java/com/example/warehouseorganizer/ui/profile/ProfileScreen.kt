@@ -3,6 +3,7 @@ package com.example.warehouseorganizer.ui.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
@@ -44,7 +45,9 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -52,14 +55,15 @@ fun ProfileScreen(
             painter = rememberImagePainter(data = photoUrl),
             contentDescription = "Profile Picture",
             modifier = Modifier
+                .padding(top = 50.dp)
                 .size(120.dp)
                 .background(MaterialTheme.colorScheme.primary)
-                .clip(MaterialTheme.shapes.large)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
+            shape = RoundedCornerShape(20.dp),
             value = username ?: "",
             onValueChange = {},
             label = { Text("Username") },
@@ -69,13 +73,13 @@ fun ProfileScreen(
             readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
                 .padding(0.dp, 0.dp, 0.dp, 8.dp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
+            shape = RoundedCornerShape(20.dp),
             value = email ?: "",
             onValueChange = {},
             label = { Text("Email") },
@@ -85,22 +89,27 @@ fun ProfileScreen(
             readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
                 .padding(0.dp, 0.dp, 0.dp, 8.dp)
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = { isLogoutDialogVisible = true },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(50.dp)
+                .clip(
+                    shape = RoundedCornerShape(20.dp)
+                )
         ) {
             Text("Logout")
         }
-
-// Logout confirmation dialog
         if (isLogoutDialogVisible) {
             AlertDialog(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
                 onDismissRequest = { isLogoutDialogVisible = false },
                 title = { Text("Logout") },
                 text = { Text("Are you sure you want to logout?") },
@@ -110,14 +119,16 @@ fun ProfileScreen(
                             isLogoutDialogVisible = false
                             profileViewModel.logout()
                             navController.navigate("loginScreen")
-                        }
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
                         Text("Yes")
                     }
                 },
                 dismissButton = {
                     Button(
-                        onClick = { isLogoutDialogVisible = false }
+                        onClick = { isLogoutDialogVisible = false },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
                         Text("No")
                     }

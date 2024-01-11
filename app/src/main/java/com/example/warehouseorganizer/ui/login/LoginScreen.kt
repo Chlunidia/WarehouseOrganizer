@@ -3,7 +3,10 @@ package com.example.warehouseorganizer.ui.login
 import android.graphics.Color.parseColor
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -72,7 +75,7 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(350.dp)
+                    .height(450.dp)
                     .constrainAs(column) {
                         bottom.linkTo(parent.bottom)
                     }
@@ -90,18 +93,11 @@ fun LoginScreen(
                         .align(Alignment.CenterHorizontally),
                     color = Color.Black
                 )
-                TextField(
+                OutlinedTextField(
                     value = emailState.value,
                     onValueChange = { loginViewModel.onEmailChange(it) },
                     label = { Text(text = "Type your Email") },
                     shape = RoundedCornerShape(20.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        backgroundColor = Color(parseColor("#e0f5f4")),
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        textColor = Color(parseColor("#5E5E5E")),
-                        unfocusedLabelColor = Color(parseColor("#5E5E5E"))
-                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 5.dp)
@@ -113,13 +109,6 @@ fun LoginScreen(
                     label = { Text(text = "Type your Password") },
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(20.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        backgroundColor = Color(parseColor("#e0f5f4")),
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        textColor = Color(parseColor("#5E5E5E")),
-                        unfocusedLabelColor = Color(parseColor("#5E5E5E"))
-                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 5.dp)
@@ -134,19 +123,18 @@ fun LoginScreen(
                                 is LoginResult.Success -> {
                                     onLoginSuccess()
                                 }
+
                                 is LoginResult.Error -> {
                                 }
+
                                 else -> {}
                             }
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 24.dp)
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
                         .height(55.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(parseColor("#faac64"))
-                    ),
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Text(
@@ -154,6 +142,29 @@ fun LoginScreen(
                         color = Color.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
+                    )
+                }
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Don't have an account?",
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp)
+                    )
+                    Text(
+                        text = "Sign Up",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate("signUpScreen")
+                            }
                     )
                 }
             }

@@ -2,8 +2,6 @@ package com.example.warehouseorganizer.ui.login
 
 import androidx.lifecycle.ViewModel
 import com.example.warehouseorganizer.model.User
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.example.warehouseorganizer.data.LoginRepository
