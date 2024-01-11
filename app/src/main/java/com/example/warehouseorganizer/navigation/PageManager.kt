@@ -102,7 +102,7 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean, selectedTab: 
             }
         }
         composable("profileScreen") {
-            ProfileScreen()
+            ProfileScreen(navController)
         }
     }
     BottomNavigationBar(

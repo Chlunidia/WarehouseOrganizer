@@ -1,11 +1,15 @@
 package com.example.warehouseorganizer.ui.profile
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class ProfileViewModel : ViewModel() {
 
@@ -28,6 +32,12 @@ class ProfileViewModel : ViewModel() {
             _usernameState.value = currentUser.displayName ?: "No Username"
             _emailState.value = currentUser.email ?: "No Email"
             _photoUrlState.value = currentUser.photoUrl.toString()
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            FirebaseAuth.getInstance().signOut()
         }
     }
 }

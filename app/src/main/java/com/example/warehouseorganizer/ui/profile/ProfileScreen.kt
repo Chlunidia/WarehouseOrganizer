@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.warehouseorganizer.navigation.NavigationDestination
 
@@ -31,11 +33,13 @@ object DestinasiProvile : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    navController: NavController,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
     val username by profileViewModel.usernameState.collectAsState()
     val email by profileViewModel.emailState.collectAsState()
     val photoUrl by profileViewModel.photoUrlState.collectAsState()
+    var isLogoutDialogVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -84,5 +88,41 @@ fun ProfileScreen(
                 .height(80.dp)
                 .padding(0.dp, 0.dp, 0.dp, 8.dp)
         )
+
+        Button(
+            onClick = { isLogoutDialogVisible = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
+            Text("Logout")
+        }
+
+// Logout confirmation dialog
+        if (isLogoutDialogVisible) {
+            AlertDialog(
+                onDismissRequest = { isLogoutDialogVisible = false },
+                title = { Text("Logout") },
+                text = { Text("Are you sure you want to logout?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            isLogoutDialogVisible = false
+                            profileViewModel.logout()
+                            navController.navigate("loginScreen")
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { isLogoutDialogVisible = false }
+                    ) {
+                        Text("No")
+                    }
+                }
+            )
+        }
     }
 }
