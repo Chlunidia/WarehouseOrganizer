@@ -11,6 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +44,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(factory = ViewModelProviderFactory.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -65,13 +69,47 @@ fun HomeScreen(
         },
     ) { innerPadding ->
         val uiStateItem by viewModel.homeUIState.collectAsState()
-        BodyHome(
-            items = uiStateItem.listItems,
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            onItemClick = onDetailClick
-        )
+
+        val filteredItems = if (searchQuery.isNotBlank()) {
+            uiStateItem.listItems.filter { item ->
+                item.name.contains(searchQuery, ignoreCase = true) ||
+                        item.rack.contains(searchQuery, ignoreCase = true)
+            }
+        } else {
+            uiStateItem.listItems
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = {
+                    searchQuery = it
+                },
+                label = { Text("Search by name or rack") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+
+            if (filteredItems.isEmpty()) {
+                Text(
+                    text = "No items available",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            } else {
+                ListItem(
+                    items = filteredItems,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                    onItemClick = onDetailClick
+                )
+            }
+        }
     }
 }
 

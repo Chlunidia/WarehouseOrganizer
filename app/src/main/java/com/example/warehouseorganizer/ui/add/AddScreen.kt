@@ -155,7 +155,7 @@ fun FormInput(
             imageUri = uri.toString()
             imageUri?.let {
                 bitmap = context.getBitmapFromUri(Uri.parse(it))
-                onValueChange(addEvent.copy(imageBitmap = bitmap)) // Update AddEvent with Bitmap
+                onValueChange(addEvent.copy(imageBitmap = bitmap))
             }
         }
     )
