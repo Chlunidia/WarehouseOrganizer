@@ -20,5 +20,4 @@ class AddViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         val result = itemRepository.saveItemWithImage(bitmap, name, rack, quantity)
         println(result)
     }
-
 }

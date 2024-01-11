@@ -100,19 +100,34 @@ class FirebaseItemRepository(
     override suspend fun updateItem(item: Item, bitmap: Bitmap?) {
         try {
             if (bitmap != null) {
-                val imageUrl = saveUploadImg(bitmap, item.name, item.quantity, item.rack)
-                val itemWithImage = item.copy(imageUrl = imageUrl)
+                val imageName = "${item.name}-${item.rack}"
+                val storageRef: StorageReference = FirebaseStorage.getInstance().reference
+                val imagesRef: StorageReference = storageRef.child("images/$imageName.jpg")
+
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                val data = stream.toByteArray()
+
+                val uploadTask = imagesRef.putBytes(data)
+                uploadTask.await()
+
+                val uri = imagesRef.downloadUrl.await()
+                val itemWithImage = item.copy(imageUrl = uri.toString())
                 updateItemWithImage(itemWithImage)
             } else {
                 firestore.collection("items").document(item.id).set(item).await()
             }
         } catch (e: Exception) {
-            "Gagal $e"
+            throw e
         }
     }
 
     override suspend fun updateItemWithImage(item: Item) {
-        val documentReference = firestore.collection("items").document(item.id).set(item).await()
+        try {
+            firestore.collection("items").document(item.id).set(item).await()
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     override suspend fun deleteItem(itemId: String) {
