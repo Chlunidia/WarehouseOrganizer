@@ -112,6 +112,33 @@ fun HomeScreen(
 }
 
 @Composable
+fun BodyHome(
+    items: List<Item>,
+    modifier: Modifier = Modifier,
+    onItemClick: (Item) -> Unit = {}
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        if (items.isEmpty()) {
+            Text(
+                text = "No items available",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge
+            )
+        } else {
+            ListItem(
+                items = items,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                onItemClick = onItemClick
+            )
+        }
+    }
+}
+
+@Composable
 fun ListItem(
     items: List<Item>,
     modifier: Modifier = Modifier,

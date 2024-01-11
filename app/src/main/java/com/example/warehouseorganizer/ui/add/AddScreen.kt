@@ -58,7 +58,7 @@ import java.io.IOException
 
 object DestinasiEntry : NavigationDestination {
     override val route = "item_entry"
-    override val titleRes = "Entry"
+    override val titleRes = "Add New Item"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
