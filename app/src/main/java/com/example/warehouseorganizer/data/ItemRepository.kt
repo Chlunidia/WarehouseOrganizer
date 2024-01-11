@@ -55,11 +55,8 @@ class FirebaseItemRepository(
         return try {
             val documentReference = firestore.collection("items").add(item).await()
             val updatedItem = item.copy(id = documentReference.id)
-
-            // Update the Item with the Firestore-generated DocumentReference
             firestore.collection("items").document(documentReference.id)
                 .set(updatedItem)
-
             "Berhasil + ${documentReference.id}"
         } catch (e: Exception) {
             "Gagal $e"
@@ -70,10 +67,8 @@ class FirebaseItemRepository(
         return try {
             val imageUrl = saveUploadImg(bitmap, name, quantity, rack)
             val item = Item(imageUrl = imageUrl, name = name, rack = rack, quantity = quantity)
-
             val documentReference = firestore.collection("items").document()
             documentReference.set(item.copy(id = documentReference.id)).await()
-
             "Berhasil + ${documentReference.id}"
         } catch (e: Exception) {
             "Gagal $e"
@@ -90,11 +85,9 @@ class FirebaseItemRepository(
             val imageName = "$name-$rack"
             val storageRef: StorageReference = FirebaseStorage.getInstance().reference
             val imagesRef: StorageReference = storageRef.child("images/$imageName.jpg")
-
             val stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
             val data = stream.toByteArray()
-
             val uploadTask = imagesRef.putBytes(data)
             uploadTask.await()
             val uri = imagesRef.downloadUrl.await()

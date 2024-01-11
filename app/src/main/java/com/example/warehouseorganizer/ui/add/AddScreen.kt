@@ -100,7 +100,6 @@ fun AddScreen(
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
         )
-
     }
 }
 
