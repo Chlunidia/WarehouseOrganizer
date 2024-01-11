@@ -46,14 +46,14 @@ fun EditScreen(
     ) { innerPadding ->
         val onSaveClick: (Bitmap?, String, String, Int) -> Unit = { bitmap, name, rack, quantity ->
             coroutineScope.launch {
-                viewModel.updateItem()
+                viewModel.updateItem(bitmap, name, rack, quantity)
                 navigateBack()
             }
         }
 
         EntryBody(
-            addUIState = viewModel.addUIState,
-            onItemValueChange = viewModel::updateAddUIState,
+            addUIState = viewModel.editUIState,
+            onItemValueChange = viewModel::updateEditUIState,
             onSaveClick = onSaveClick,
             modifier = Modifier
                 .padding(innerPadding)
