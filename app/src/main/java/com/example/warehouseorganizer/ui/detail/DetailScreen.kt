@@ -171,6 +171,7 @@ fun ItemDetails(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(380.dp)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop
             )
