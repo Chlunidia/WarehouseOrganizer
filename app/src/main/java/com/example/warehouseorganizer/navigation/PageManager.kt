@@ -19,6 +19,7 @@ import com.example.warehouseorganizer.ui.edit.EditScreen
 import com.example.warehouseorganizer.ui.home.HomeScreen
 import com.example.warehouseorganizer.ui.login.LoginScreen
 import com.example.warehouseorganizer.ui.login.LoginViewModel
+import com.example.warehouseorganizer.ui.profile.ProfileScreen
 import com.example.warehouseorganizer.ui.signup.SignUpScreen
 import com.example.warehouseorganizer.ui.signup.SignUpViewModel
 
@@ -59,10 +60,15 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean) {
                 navigateToItemEntry = {
                     navController.navigate("addScreen")
                 },
+                navigateToHome = {
+                    navController.navigate("homeScreen")
+                },
+                navigateToProfile = {
+                    navController.navigate("profileScreen")
+                },
                 onDetailClick = { item ->
                     navController.navigate("${DetailDestination.route}/${item.id}")
-                }
-            )
+                },)
         }
         composable(
             route = DetailDestination.routeWithArgs,
@@ -93,6 +99,9 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean) {
                     onNavigateUp = { navController.navigateUp() }
                 )
             }
+        }
+        composable("profileScreen") {
+            ProfileScreen()
         }
     }
 }

@@ -5,8 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,12 +42,15 @@ object DestinasiHome : NavigationDestination {
 @Composable
 fun HomeScreen(
     navigateToItemEntry: () -> Unit,
+    navigateToProfile: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     onDetailClick: (Item) -> Unit = {},
     viewModel: HomeViewModel = viewModel(factory = ViewModelProviderFactory.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var searchQuery by remember { mutableStateOf("") }
+    var selectedTab by remember { mutableStateOf(NavItem.Home) }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -53,6 +59,27 @@ fun HomeScreen(
                 title = "Warehouse Organizer",
                 canNavigateBack = false,
                 scrollBehavior = scrollBehavior
+            )
+        },
+        bottomBar = {
+            BottomNavigationBar(
+                selectedTab = selectedTab,
+                onTabSelected = { tab ->
+                    when (tab) {
+                        NavItem.Home -> {
+                            navigateToHome.invoke()
+                        }
+                        NavItem.AddItem -> {
+                            navigateToItemEntry.invoke()
+                        }
+                        NavItem.Profile -> {
+                            navigateToProfile.invoke()
+                        }
+                    }
+                },
+                navigateToItemEntry = navigateToItemEntry,
+                navigateToProfile = navigateToProfile,
+                navigateToHome = navigateToHome,
             )
         },
         floatingActionButton = {
@@ -78,7 +105,6 @@ fun HomeScreen(
         } else {
             uiStateItem.listItems
         }
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.padding(top = 50.dp)
@@ -142,7 +168,7 @@ fun BodyHome(
 fun ListItem(
     items: List<Item>,
     modifier: Modifier = Modifier,
-    onItemClick: (Item) -> Unit
+    onItemClick: (Item) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.padding(16.dp)
@@ -207,5 +233,47 @@ fun ItemCard(
                 )
             }
         }
+    }
+}
+
+// Definisikan enum untuk tab dengan indeks
+enum class NavItem(val index: Int) {
+    Home(0),
+    AddItem(1),
+    Profile(2)
+}
+
+@Composable
+fun BottomNavigationBar(
+    selectedTab: NavItem,
+    onTabSelected: (NavItem) -> Unit,
+    navigateToItemEntry: () -> Unit,
+    navigateToProfile: () -> Unit,
+    navigateToHome: () -> Unit,
+) {
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary,
+        elevation = 8.dp
+    ) {
+        // Tambahkan item untuk setiap tab di bottom navigation bar
+        BottomNavigationItem(
+            icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "Home") },
+            label = { Text("Home") },
+            selected = selectedTab == NavItem.Home,
+            onClick = { navigateToHome() }
+        )
+        BottomNavigationItem(
+            icon = { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") },
+            label = { Text("Add Item") },
+            selected = selectedTab == NavItem.AddItem,
+            onClick = { navigateToItemEntry() }
+        )
+        BottomNavigationItem(
+            icon = { Icon(imageVector = Icons.Default.Person, contentDescription = "Profile") },
+            label = { Text("Profile") },
+            selected = selectedTab == NavItem.Profile,
+            onClick = { navigateToProfile() }
+        )
     }
 }
