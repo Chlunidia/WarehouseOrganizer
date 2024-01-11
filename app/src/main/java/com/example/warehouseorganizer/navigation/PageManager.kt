@@ -15,6 +15,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.warehouseorganizer.data.FirebaseAuthRepository
 import com.example.warehouseorganizer.ui.ViewModelProviderFactory
 import com.example.warehouseorganizer.ui.add.AddScreen
 import com.example.warehouseorganizer.ui.detail.DetailDestination
@@ -29,6 +30,7 @@ import com.example.warehouseorganizer.ui.login.LoginViewModel
 import com.example.warehouseorganizer.ui.profile.ProfileScreen
 import com.example.warehouseorganizer.ui.signup.SignUpScreen
 import com.example.warehouseorganizer.ui.signup.SignUpViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun PageManager(navController: NavController, isLoggedIn: Boolean, selectedTab: MutableState<NavItem>) {
@@ -38,6 +40,7 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean, selectedTab: 
         navController = navController as NavHostController,
         startDestination = if (isLoggedIn) "homeScreen" else "loginScreen"
     ) {
+
         composable("signUpScreen") {
             SignUpScreen(
                 navController = navController,
@@ -48,9 +51,12 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean, selectedTab: 
             )
         }
         composable("loginScreen") {
+            val loginRepository = FirebaseAuthRepository(FirebaseAuth.getInstance())
+            val loginViewModel = LoginViewModel(loginRepository)
+
             LoginScreen(
                 navController = navController,
-                loginViewModel = LoginViewModel(),
+                loginViewModel = loginViewModel,
                 onLoginSuccess = {
                     navController.navigate("homeScreen")
                 }

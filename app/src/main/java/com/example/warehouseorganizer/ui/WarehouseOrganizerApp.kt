@@ -24,21 +24,16 @@ fun WarehouseOrganizerApp() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            BottomNavigationBar(
-                selectedTab = selectedTab,
-                onTabSelected = { tab ->
-                    selectedTab = tab
-                    when (tab) {
-                        NavItem.Home -> navController.navigate("homeScreen")
-                        NavItem.Profile -> navController.navigate("profileScreen")
-                        // Add other cases for each tab
-                        else -> {}
-                    }
-                },
-                navigateToItemEntry = { navController.navigate("addScreen") },
-                navigateToProfile = { navController.navigate("profileScreen") },
-                navigateToHome = { navController.navigate("homeScreen") }
-            )
+            if (isLoggedIn) {
+                BottomNavigationBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab ->
+                    },
+                    navigateToItemEntry = { navController.navigate("addScreen") },
+                    navigateToProfile = { navController.navigate("profileScreen") },
+                    navigateToHome = { navController.navigate("homeScreen") }
+                )
+            }
         }
     ) {
         PageManager(navController = navController, isLoggedIn = isLoggedIn, selectedTab = mutableStateOf(selectedTab))

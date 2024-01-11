@@ -131,10 +131,10 @@ fun LoginScreen(
                             loginViewModel.loginUser()
                             val loginResult = loginViewModel.loginState.value
                             when (loginResult) {
-                                is LoginState.Success -> {
+                                is LoginResult.Success -> {
                                     onLoginSuccess()
                                 }
-                                is LoginState.Error -> {
+                                is LoginResult.Error -> {
                                 }
                                 else -> {}
                             }

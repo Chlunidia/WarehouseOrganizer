@@ -6,30 +6,27 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import com.example.warehouseorganizer.data.LoginRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-sealed class LoginState {
-    object Loading : LoginState()
-    class Success(val user: User) : LoginState()
-    class Error(val message: String) : LoginState()
+sealed class LoginResult {
+    data class Success(val user: User) : LoginResult()
+    data class Error(val message: String) : LoginResult()
 }
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
-    // State untuk email dan password
     private val _emailState = mutableStateOf("")
     val emailState: MutableState<String> = _emailState
 
     private val _passwordState = mutableStateOf("")
     val passwordState: MutableState<String> = _passwordState
 
-    // State untuk status login
-    private val _loginState: MutableStateFlow<LoginState?> = MutableStateFlow(null)
-    val loginState: StateFlow<LoginState?> = _loginState.asStateFlow()
+    private val _loginState: MutableStateFlow<LoginResult?> = MutableStateFlow(null)
+    val loginState: StateFlow<LoginResult?> = _loginState.asStateFlow()
 
-    // Metode untuk merubah nilai email dan password
     fun onEmailChange(email: String) {
         _emailState.value = email
     }
@@ -38,35 +35,13 @@ class LoginViewModel : ViewModel() {
         _passwordState.value = password
     }
 
-    // Metode untuk melakukan login
     suspend fun loginUser() {
         val email = _emailState.value
         val password = _passwordState.value
 
-        _loginState.value = LoginState.Loading
+        _loginState.value = LoginResult.Success(User("id", "dummy@gmail.com")) // Placeholder loading state
 
-        // Panggil metode loginUserWithEmailPassword pada LoginViewModel
-        loginUserWithEmailPassword(email, password)
-    }
-
-    // Metode untuk melakukan login menggunakan Firebase
-    private suspend fun loginUserWithEmailPassword(email: String, password: String) {
-        try {
-            val authResult = FirebaseAuth.getInstance()
-                .signInWithEmailAndPassword(email, password)
-                .await()
-
-            val firebaseUser = authResult.user
-
-            // Jika login berhasil, update _loginState dengan LoginState.Success
-            firebaseUser?.let {
-                _loginState.value = LoginState.Success(User(it.uid, it.email ?: ""))
-            } ?: run {
-                _loginState.value = LoginState.Error("User is null")
-            }
-        } catch (e: Exception) {
-            // Jika login gagal, update _loginState dengan LoginState.Error
-            _loginState.value = LoginState.Error(e.message ?: "Login failed")
-        }
+        // Panggil metode loginUser di LoginRepository
+        _loginState.value = loginRepository.loginUser(email, password)
     }
 }

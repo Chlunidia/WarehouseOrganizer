@@ -1,6 +1,7 @@
 package com.example.warehouseorganizer.data
 
 import com.example.warehouseorganizer.model.User
+import com.example.warehouseorganizer.ui.login.LoginResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -10,7 +11,7 @@ import kotlin.coroutines.suspendCoroutine
 
 interface LoginRepository {
     suspend fun getCurrentUser(): User?
-    suspend fun loginUser(email: String, password: String): User?
+    suspend fun loginUser(email: String, password: String): LoginResult
     suspend fun logoutUser()
 }
 
@@ -20,13 +21,18 @@ class FirebaseAuthRepository(private val firebaseAuth: FirebaseAuth) : LoginRepo
         return currentUser?.let { User(it.uid, it.email ?: "") }
     }
 
-    override suspend fun loginUser(email: String, password: String): User? {
+    override suspend fun loginUser(email: String, password: String): LoginResult {
         return try {
             val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             val firebaseUser = authResult.user
-            firebaseUser?.let { User(it.uid, it.email ?: "") }
+
+            firebaseUser?.let {
+                LoginResult.Success(User(it.uid, it.email ?: ""))
+            } ?: run {
+                LoginResult.Error("User is null")
+            }
         } catch (e: Exception) {
-            null
+            LoginResult.Error(e.message ?: "Login failed")
         }
     }
 
