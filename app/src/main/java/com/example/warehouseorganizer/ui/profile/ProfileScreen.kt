@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.warehouseorganizer.navigation.NavigationDestination
+import com.example.warehouseorganizer.ui.login.DestinasiLogin
 
 object DestinasiProvile : NavigationDestination {
     override val route = "profile"
@@ -34,6 +35,7 @@ object DestinasiProvile : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    onClickedSignOut: () -> Unit,
     navController: NavController,
     profileViewModel: ProfileViewModel = viewModel()
 ) {

@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.warehouseorganizer.data.FirebaseAuthRepository
+import com.example.warehouseorganizer.ui.MainPage
 import com.example.warehouseorganizer.ui.ViewModelProviderFactory
 import com.example.warehouseorganizer.ui.add.AddScreen
 import com.example.warehouseorganizer.ui.detail.DetailDestination
@@ -33,14 +34,12 @@ import com.example.warehouseorganizer.ui.signup.SignUpViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun PageManager(navController: NavController, isLoggedIn: Boolean, selectedTab: MutableState<NavItem>) {
-    var selectedTab by remember { mutableStateOf(NavItem.Home) }
+fun PageManager(navController: NavController, isLoggedIn: Boolean) {
 
     NavHost(
         navController = navController as NavHostController,
-        startDestination = if (isLoggedIn) "homeScreen" else "loginScreen"
+        startDestination = if (isLoggedIn) "mainPage" else "loginScreen"
     ) {
-
         composable("signUpScreen") {
             SignUpScreen(
                 navController = navController,
@@ -58,65 +57,17 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean, selectedTab: 
                 navController = navController,
                 loginViewModel = loginViewModel,
                 onLoginSuccess = {
-                    navController.navigate("homeScreen")
+                    navController.navigate("mainPage")
                 }
             )
         }
-        composable(route = "addScreen") {
-            AddScreen(
-                navigateBack = { navController.popBackStack() },
-                context = LocalContext.current,
-                modifier = Modifier,
-                addViewModel = viewModel(factory = ViewModelProviderFactory.Factory)
-            )
-        }
-        composable("homeScreen") {
-            HomeScreen(
-                onDetailClick = { item ->
-                    navController.navigate("${DetailDestination.route}/${item.id}")
+        composable("mainPage") {
+            MainPage(
+                onClickedSignOut = {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate("loginScreen")
                 }
             )
-        }
-        composable(
-            route = DetailDestination.routeWithArgs,
-            arguments = listOf(navArgument(DetailDestination.itemId) {
-                type = NavType.StringType
-            })
-        ) { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getString(DetailDestination.itemId)
-            itemId?.let {
-                DetailScreen(
-                    navigateBack = { navController.popBackStack() },
-                    navigateToEditItem = {
-                        navController.navigate("${EditDestination.route}/$itemId")
-                    }
-                )
-            }
-        }
-        composable(
-            route = EditDestination.routeWithArgs,
-            arguments = listOf(navArgument(EditDestination.itemId) {
-                type = NavType.StringType
-            })
-        ) { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getString(EditDestination.itemId)
-            itemId?.let {
-                EditScreen(
-                    navigateBack = { navController.popBackStack() },
-                    onNavigateUp = { navController.navigateUp() }
-                )
-            }
-        }
-        composable("profileScreen") {
-            ProfileScreen(navController)
         }
     }
-    BottomNavigationBar(
-        selectedTab = selectedTab,
-        onTabSelected = { tab ->
-        },
-        navigateToItemEntry = { navController.navigate("addScreen") },
-        navigateToProfile = { navController.navigate("profileScreen") },
-        navigateToHome = { navController.navigate("homeScreen") }
-    )
 }

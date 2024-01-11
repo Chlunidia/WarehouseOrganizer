@@ -201,10 +201,10 @@ fun ItemCard(
     }
 }
 
-enum class NavItem(val index: Int) {
-    Home(0),
-    AddItem(1),
-    Profile(2)
+enum class NavItem {
+    Home,
+    AddItem,
+    Profile
 }
 
 @Composable
@@ -220,7 +220,6 @@ fun BottomNavigationBar(
         contentColor = MaterialTheme.colorScheme.primary,
         elevation = 8.dp
     ) {
-        // Tambahkan item untuk setiap tab di bottom navigation bar
         BottomNavigationItem(
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "Home") },
             selected = selectedTab == NavItem.Home,

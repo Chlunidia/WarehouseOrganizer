@@ -8,32 +8,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.warehouseorganizer.navigation.MainPageManager
 import com.example.warehouseorganizer.navigation.PageManager
+import com.example.warehouseorganizer.ui.add.WarehouseOrganizerTopAppBar
 import com.example.warehouseorganizer.ui.home.BottomNavigationBar
+import com.example.warehouseorganizer.ui.home.DestinasiHome
 import com.example.warehouseorganizer.ui.home.NavItem
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WarehouseOrganizerApp() {
     val navController = rememberNavController()
     val isLoggedIn = FirebaseAuth.getInstance().currentUser != null
-    var selectedTab by remember { mutableStateOf(NavItem.Home) }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = selectedTab,
-                onTabSelected = { tab ->
-                },
-                navigateToItemEntry = { navController.navigate("addScreen") },
-                navigateToProfile = { navController.navigate("profileScreen") },
-                navigateToHome = { navController.navigate("homeScreen") }
-            )
-        }
-    ) {
-        PageManager(navController = navController, isLoggedIn = isLoggedIn, selectedTab = mutableStateOf(selectedTab))
-    }
+    PageManager(
+        navController = navController,
+        isLoggedIn = isLoggedIn
+    )
 }

@@ -106,8 +106,8 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = passwordState.value,
                     onValueChange = { loginViewModel.onPasswordChange(it) },
-                    label = { Text(text = "Type your Password") },
                     visualTransformation = PasswordVisualTransformation(),
+                    label = { Text(text = "Type your Password") },
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
