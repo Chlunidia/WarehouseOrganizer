@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
@@ -43,7 +44,6 @@ fun ProfileScreen(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Profile Picture
         Image(
             painter = rememberImagePainter(data = photoUrl),
             contentDescription = "Profile Picture",
@@ -55,8 +55,7 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Username TextField
-        TextField(
+        OutlinedTextField(
             value = username ?: "",
             onValueChange = {},
             label = { Text("Username") },
@@ -66,14 +65,13 @@ fun ProfileScreen(
             readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(80.dp)
                 .padding(0.dp, 0.dp, 0.dp, 8.dp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Email TextField
-        TextField(
+        OutlinedTextField(
             value = email ?: "",
             onValueChange = {},
             label = { Text("Email") },
@@ -83,7 +81,7 @@ fun ProfileScreen(
             readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(80.dp)
                 .padding(0.dp, 0.dp, 0.dp, 8.dp)
         )
     }

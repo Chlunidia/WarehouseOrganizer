@@ -1,6 +1,11 @@
 package com.example.warehouseorganizer.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,7 +21,9 @@ import com.example.warehouseorganizer.ui.detail.DetailDestination
 import com.example.warehouseorganizer.ui.detail.DetailScreen
 import com.example.warehouseorganizer.ui.edit.EditDestination
 import com.example.warehouseorganizer.ui.edit.EditScreen
+import com.example.warehouseorganizer.ui.home.BottomNavigationBar
 import com.example.warehouseorganizer.ui.home.HomeScreen
+import com.example.warehouseorganizer.ui.home.NavItem
 import com.example.warehouseorganizer.ui.login.LoginScreen
 import com.example.warehouseorganizer.ui.login.LoginViewModel
 import com.example.warehouseorganizer.ui.profile.ProfileScreen
@@ -24,7 +31,9 @@ import com.example.warehouseorganizer.ui.signup.SignUpScreen
 import com.example.warehouseorganizer.ui.signup.SignUpViewModel
 
 @Composable
-fun PageManager(navController: NavController, isLoggedIn: Boolean) {
+fun PageManager(navController: NavController, isLoggedIn: Boolean, selectedTab: MutableState<NavItem>) {
+    var selectedTab by remember { mutableStateOf(NavItem.Home) }
+
     NavHost(
         navController = navController as NavHostController,
         startDestination = if (isLoggedIn) "homeScreen" else "loginScreen"
@@ -50,25 +59,17 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean) {
         composable(route = "addScreen") {
             AddScreen(
                 navigateBack = { navController.popBackStack() },
-                context = LocalContext.current,  // Provide the context here
+                context = LocalContext.current,
                 modifier = Modifier,
                 addViewModel = viewModel(factory = ViewModelProviderFactory.Factory)
             )
         }
         composable("homeScreen") {
             HomeScreen(
-                navigateToItemEntry = {
-                    navController.navigate("addScreen")
-                },
-                navigateToHome = {
-                    navController.navigate("homeScreen")
-                },
-                navigateToProfile = {
-                    navController.navigate("profileScreen")
-                },
                 onDetailClick = { item ->
                     navController.navigate("${DetailDestination.route}/${item.id}")
-                },)
+                }
+            )
         }
         composable(
             route = DetailDestination.routeWithArgs,
@@ -104,4 +105,12 @@ fun PageManager(navController: NavController, isLoggedIn: Boolean) {
             ProfileScreen()
         }
     }
+    BottomNavigationBar(
+        selectedTab = selectedTab,
+        onTabSelected = { tab ->
+        },
+        navigateToItemEntry = { navController.navigate("addScreen") },
+        navigateToProfile = { navController.navigate("profileScreen") },
+        navigateToHome = { navController.navigate("homeScreen") }
+    )
 }

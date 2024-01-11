@@ -35,64 +35,27 @@ import com.example.warehouseorganizer.ui.add.WarehouseOrganizerTopAppBar
 
 object DestinasiHome : NavigationDestination {
     override val route = "home"
-    override val titleRes = "Item"
+    override val titleRes = "Warehouse Organizer"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navigateToItemEntry: () -> Unit,
-    navigateToProfile: () -> Unit,
-    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     onDetailClick: (Item) -> Unit = {},
     viewModel: HomeViewModel = viewModel(factory = ViewModelProviderFactory.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var searchQuery by remember { mutableStateOf("") }
-    var selectedTab by remember { mutableStateOf(NavItem.Home) }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             WarehouseOrganizerTopAppBar(
-                title = "Warehouse Organizer",
+                title = DestinasiHome.titleRes,
                 canNavigateBack = false,
                 scrollBehavior = scrollBehavior
             )
-        },
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = selectedTab,
-                onTabSelected = { tab ->
-                    when (tab) {
-                        NavItem.Home -> {
-                            navigateToHome.invoke()
-                        }
-                        NavItem.AddItem -> {
-                            navigateToItemEntry.invoke()
-                        }
-                        NavItem.Profile -> {
-                            navigateToProfile.invoke()
-                        }
-                    }
-                },
-                navigateToItemEntry = navigateToItemEntry,
-                navigateToProfile = navigateToProfile,
-                navigateToHome = navigateToHome,
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = navigateToItemEntry,
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(18.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = ""
-                )
-            }
         },
     ) { innerPadding ->
         val uiStateItem by viewModel.homeUIState.collectAsState()
