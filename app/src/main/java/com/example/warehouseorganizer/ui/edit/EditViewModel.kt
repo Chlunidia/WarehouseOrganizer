@@ -1,5 +1,6 @@
 package com.example.warehouseorganizer.ui.edit
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,26 +21,29 @@ class EditViewModel(
     private val repository: ItemRepository
 ) : ViewModel() {
 
-    var addUIState by mutableStateOf(AddUIState())
+    var editUIState by mutableStateOf(AddUIState())
         private set
 
     private val itemId: String = checkNotNull(savedStateHandle[EditDestination.itemId])
 
     init {
         viewModelScope.launch {
-            addUIState =
-                repository.getItemById(itemId)
-                    .filterNotNull()
-                    .first()
-                    .toUIStateItem()
+            repository.getItemById(itemId)
+                .filterNotNull()
+                .first()
+                .toUIStateItem()
+                .let { uiStateItem ->
+                    editUIState = uiStateItem
+                }
         }
     }
 
-    fun updateAddUIState(addEvent: AddEvent) {
-        addUIState = addUIState.copy(addEvent = addEvent)
+    fun updateEditUIState(addEvent: AddEvent) {
+        editUIState = editUIState.copy(addEvent = addEvent)
     }
 
-    suspend fun updateItem() {
-        repository.updateItem(addUIState.addEvent.toItem(), null)
+    suspend fun updateItem(bitmap: Bitmap?, name: String, rack: String, quantity: Int) {
+        val updatedItem = editUIState.addEvent.toItem().copy(name = name, rack = rack, quantity = quantity)
+        repository.updateItem(updatedItem, bitmap)
     }
 }
