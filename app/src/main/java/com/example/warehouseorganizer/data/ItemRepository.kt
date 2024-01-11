@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import com.example.warehouseorganizer.model.Item
 import com.example.warehouseorganizer.ui.add.AddEvent
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
@@ -24,7 +25,6 @@ interface ItemRepository {
     suspend fun updateItem(item: Item, bitmap: Bitmap? = null)
     suspend fun deleteItem(itemId: String)
     fun getItemById(itemId: String): Flow<Item>
-
     suspend fun saveItemWithImage(bitmap: Bitmap, name: String, rack: String, quantity: Int): String
     suspend fun updateItemWithImage(item: Item)
     suspend fun saveUploadImg(
@@ -41,22 +41,30 @@ class FirebaseItemRepository(
     private val storage: FirebaseStorage,
     private val context: Context
 ) : ItemRepository {
-
+    val user = FirebaseAuth.getInstance().currentUser
+    val uid = user?.uid.toString()
     override fun getAllItems(): Flow<List<Item>> = flow {
-        val snapshot = firestore.collection("items")
+        val snapshot = firestore.collection("users").document(uid)
+            .collection("items")
             .orderBy("name", Query.Direction.ASCENDING)
             .get()
             .await()
+
         val items = snapshot.toObjects(Item::class.java)
         emit(items)
     }.flowOn(Dispatchers.IO)
 
     override suspend fun saveItem(item: Item, bitmap: Bitmap?): String {
         return try {
-            val documentReference = firestore.collection("items").add(item).await()
+            val documentReference = firestore.collection("users").document(uid)
+                .collection("items").add(item).await()
+
             val updatedItem = item.copy(id = documentReference.id)
-            firestore.collection("items").document(documentReference.id)
+
+            firestore.collection("users").document(uid)
+                .collection("items").document(documentReference.id)
                 .set(updatedItem)
+
             "Berhasil + ${documentReference.id}"
         } catch (e: Exception) {
             "Gagal $e"
@@ -67,7 +75,10 @@ class FirebaseItemRepository(
         return try {
             val imageUrl = saveUploadImg(bitmap, name, quantity, rack)
             val item = Item(imageUrl = imageUrl, name = name, rack = rack, quantity = quantity)
-            val documentReference = firestore.collection("items").document()
+
+            val documentReference = firestore.collection("users").document(uid)
+                .collection("items").document()
+
             documentReference.set(item.copy(id = documentReference.id)).await()
             "Berhasil + ${documentReference.id}"
         } catch (e: Exception) {
@@ -115,7 +126,8 @@ class FirebaseItemRepository(
                 val itemWithImage = item.copy(imageUrl = uri.toString())
                 updateItemWithImage(itemWithImage)
             } else {
-                firestore.collection("items").document(item.id).set(item).await()
+                firestore.collection("users").document(uid).collection("items")
+                    .document(item.id).set(item).await()
             }
         } catch (e: Exception) {
             throw e
@@ -124,7 +136,8 @@ class FirebaseItemRepository(
 
     override suspend fun updateItemWithImage(item: Item) {
         try {
-            firestore.collection("items").document(item.id).set(item).await()
+            firestore.collection("users").document(uid)
+                .collection("items").document(item.id).set(item).await()
         } catch (e: Exception) {
             throw e
         }
@@ -132,7 +145,8 @@ class FirebaseItemRepository(
 
     override suspend fun deleteItem(itemId: String) {
         try {
-            firestore.collection("items").document(itemId).delete().await()
+            firestore.collection("users").document(uid)
+                .collection("items").document(itemId).delete().await()
         } catch (e: Exception) {
             "Gagal $e"
         }
@@ -140,7 +154,8 @@ class FirebaseItemRepository(
 
     override fun getItemById(itemId: String): Flow<Item> = flow {
         try {
-            val snapshot = firestore.collection("items").document(itemId).get().await()
+            val snapshot = firestore.collection("users").document(uid)
+                .collection("items").document(itemId).get().await()
             val item = snapshot.toObject(Item::class.java)
             if (item != null) {
                 emit(item)
